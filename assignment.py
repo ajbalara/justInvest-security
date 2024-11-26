@@ -68,7 +68,9 @@ HASH_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("hash")
 
 SALT_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("salt")
 
-INVALID_INPUT = "Invalid input!"
+ROLE_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("role")
+
+INVALID_INPUT = "Invalid input!\n"
 
 SPECIAL_INPUT = 0
 
@@ -90,7 +92,7 @@ def set_time()->bool:
 
 def accessible_to_teller(time: int)->bool:
     """ Returns whether or not teller has access based on the given time"""
-    return time >= 9 and time <=17
+    return time >= BUSINESS_DAY_START_HOUR and time <=BUSINESS_DAY_CLOSE_HOUR
 
 def startup():
     """ Prints the startup menu for the user to see"""
@@ -98,7 +100,7 @@ def startup():
     print("----------------------------------")
 
 def print_operations():
-    print("Operations avaiable on the system:")
+    print("Operations available on the system:")
     print("1. View account balance")
     print("2. View investment portfolio")
     print("3. Modify investment portfolio")
@@ -138,7 +140,8 @@ def launch_signup()->str:
     """ Signs up user"""
     username = input("Please enter your desired username: ")
     password = input_password()
-    add_user(username, password)
+    role = input_role()
+    add_user(username, password, role)
     print("Signup was successful!")
     return username
 
@@ -162,6 +165,30 @@ def input_password()->str:
                 print("*", end='', flush=True)
     return password
 
+def input_role()->str:
+    """ Returns the inputted role of the new user"""
+    print_roles()
+    while True:
+        try:
+            user_select = int(input("Which role would you like to signup as?\n"))
+            if user_select < 1 or user_select > 5:
+                print(INVALID_INPUT)
+            else:
+                return ACCESS_CONTROL_POLICY[user_select]
+        except:
+            print(INVALID_INPUT)
+
+
+def print_roles():
+    """ Prints out roles for the system"""
+    print("Roles available on the system:")
+    print("1. Client")
+    print("2. Premium Client")
+    print("3. Financial Advisor")
+    print("4. Financial Planner")
+    print("5. Teller")
+    print()
+
 def valid_username(username: str)->bool:
     """ Returns whether username is in password file"""
     reserved_keyword = False
@@ -180,20 +207,20 @@ def authenticate_user(username: str)->bool:
     print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[USERS[username]])
     return True
 
-def add_user(username, password):
+def add_user(username, password, role):
     """ Adds user to the passwd file"""
     return
 
-def write_user_to_file(username: str, hash: str, salt: str):
+def write_user_to_file(username: str, hash: str, salt: str, role: str):
     """ Writes a user to file"""
     file = open(PASSWORD_FILE_PATH, "a")   
 
-    string_to_write = "\n" + username + ", " + hash + ", " + str(salt)
+    string_to_write = "\n" + username + ", " + hash + ", " + salt + ", " + role
     file.write(string_to_write)
 
     file.close()
 
-def check_file_for_user(entered_username: str)-> tuple[str, str]:
+def check_file_for_user(entered_username: str)-> tuple[str, str, str]:
     """ Checks if the user is in the file and if so, returns a tuple containing it's hash value and the salt. Otherwise returns None"""
 
     file = open(PASSWORD_FILE_PATH, "r")
@@ -204,7 +231,7 @@ def check_file_for_user(entered_username: str)-> tuple[str, str]:
         username = values[USERNAME_POSITION_IN_FILE]
         
         if username == entered_username:
-            return (values[HASH_POSITION_IN_FILE], values[SALT_POSITION_IN_FILE])
+            return (values[HASH_POSITION_IN_FILE], values[SALT_POSITION_IN_FILE], values[ROLE_POSITION_IN_FILE])
     return None
 
 
