@@ -2,4 +2,4 @@
 
 SYSC 4810 Assignment completed by Anand Balaram 101217776.
 
-To run this assignment, enter ```python3 assignment.py``` in the terminal. The program should dynamically install the required libraries.
+To run this assignment, enter ```python3 assignment.py``` in the terminal in the project directory. The program should dynamically install the required libraries.
