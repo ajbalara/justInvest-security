@@ -63,11 +63,12 @@ def setup_libraries():
     print()
     try:
         import keyboard
+        print("All dependencies already installed!")
     except ImportError:
         print("keyboard library not found. Installing...")
         install("keyboard")
         import keyboard  # Retry importing after installation
-        print()
+    print()
 
 def set_time():
     time = int(input("Please enter the hour of the day (use 24 hour notation): "))
