@@ -59,12 +59,15 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 def setup_libraries():
+    print("Setting up and installing libaries...")
+    print()
     try:
         import keyboard
     except ImportError:
         print("keyboard library not found. Installing...")
         install("keyboard")
         import keyboard  # Retry importing after installation
+        print()
 
 def set_time():
     time = int(input("Please enter the hour of the day (use 24 hour notation): "))
@@ -163,9 +166,8 @@ def access_control(user_select, user_role):
     print("Access Denied!")
 
 def main():
-    
-    teller_access = set_time()
     setup_libraries()
+    teller_access = set_time()
     print_operations()
     user_role = user_sign_in(teller_access)
 
