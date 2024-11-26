@@ -6,6 +6,8 @@ import os
 
 from hashlib import blake2b
 
+import keyboard
+
 
 # Constants
 
