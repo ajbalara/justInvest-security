@@ -10,6 +10,8 @@ import subprocess
 
 import sys
 
+import random
+
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
@@ -58,7 +60,7 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 PASSWORD_FILE_PATH = os.path.join(SCRIPT_PATH, FILENAME)
 
-PASSWORD_FILE_STRUCTURE = ["username", "hash", "salt"]
+PASSWORD_FILE_STRUCTURE = ["username", "hash", "salt", "role"]
 
 USERNAME_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("username")
 
@@ -67,6 +69,8 @@ HASH_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("hash")
 SALT_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("salt")
 
 INVALID_INPUT = "Invalid input!"
+
+SPECIAL_INPUT = 0
 
 
 # Functions
@@ -84,7 +88,7 @@ def set_time()->bool:
             print(INVALID_INPUT)
             continue
 
-def accessible_to_teller(time):
+def accessible_to_teller(time: int)->bool:
     """ Returns whether or not teller has access based on the given time"""
     return time >= 9 and time <=17
 
@@ -105,7 +109,8 @@ def print_operations():
     print("0. Quit")
     print()
 
-def user_sign_in(teller_access):
+def user_sign_in(teller_access: bool)->str:
+    """ Signs the user in or registers them. Will not let tellers access the system if the time set is not between 9am and 7pm"""
     signed_in = False
     
     while(not signed_in):
@@ -114,7 +119,7 @@ def user_sign_in(teller_access):
         print()
         signup = False
         try:
-            signup = int(username) == 0
+            signup = int(username) == SPECIAL_INPUT
         except:
             signup = False
         if signup:
@@ -129,13 +134,16 @@ def user_sign_in(teller_access):
             return USERS[username]
         print("Invalid username, please try again")
     
-def launch_signup():
+def launch_signup()->str:
+    """ Signs up user"""
     username = input("Please enter your desired username: ")
     password = input_password()
+    add_user(username, password)
     print("Signup was successful!")
     return username
 
-def input_password():
+def input_password()->str:
+    """ Returns the password that the user enters"""
     prompt="Enter password: "
     print(prompt, end='', flush=True)
     password = ""
@@ -154,18 +162,30 @@ def input_password():
                 print("*", end='', flush=True)
     return password
 
-def valid_username(username):
-    return username in USERS
+def valid_username(username: str)->bool:
+    """ Returns whether username is in password file"""
+    reserved_keyword = False
+    try:
+        reserved_keyword = int(username) == SPECIAL_INPUT
+    except:
+        reserved_keyword = False
 
-def authenticate_user(username):
+    return not reserved_keyword and username in USERS
+
+def authenticate_user(username: str)->bool:
+    """ Returns whether user gives the correct password"""
+
     pwd = input("Please enter your password: ")
     print("ACCESS GRANTED!")
     print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[USERS[username]])
+    return True
 
-def add_user():
+def add_user(username, password):
+    """ Adds user to the passwd file"""
     return
 
-def write_user_to_file(username, hash, salt):
+def write_user_to_file(username: str, hash: str, salt: str):
+    """ Writes a user to file"""
     file = open(PASSWORD_FILE_PATH, "a")   
 
     string_to_write = "\n" + username + ", " + hash + ", " + str(salt)
@@ -173,7 +193,9 @@ def write_user_to_file(username, hash, salt):
 
     file.close()
 
-def check_file_for_user(entered_username):
+def check_file_for_user(entered_username: str)-> tuple[str, str]:
+    """ Checks if the user is in the file and if so, returns a tuple containing it's hash value and the salt. Otherwise returns None"""
+
     file = open(PASSWORD_FILE_PATH, "r")
 
     for line in file:
@@ -186,21 +208,32 @@ def check_file_for_user(entered_username):
     return None
 
 
-def user_selection():
+def user_selection()->int:
+    """ Returns the user selection of the options"""
     print()
-    user_select = input("Which operation would you like to perform?\n")
-    return int(user_select)
+    while True:
+        try:
+            user_select = int(input("Which operation would you like to perform?\n"))
+            if user_select < SPECIAL_INPUT or user_select > 7:
+                print(INVALID_INPUT)
+            else:
+                return user_select
+        except:
+            print(INVALID_INPUT)
 
-def quit(user_select):
-    return int(user_select) == 0
+def quit(user_select: int)->bool:
+    """ Returns whether the user has chosen to quit the program"""
+    return user_select == SPECIAL_INPUT
 
-def access_control(user_select, user_role):
+def access_control(user_select: str, user_role: str):
+    """ Prints if user has access to a service"""
     if (user_select in ACCESS_CONTROL_POLICY[user_role]):
         print("Access Granted!")
         return
     print("Access Denied!")
 
 def main():
+    """ Main program that runs"""
     teller_access = set_time()
     print_operations()
     user_role = user_sign_in(teller_access)
