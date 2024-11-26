@@ -6,7 +6,9 @@ import os
 
 from hashlib import blake2b
 
-import keyboard
+import subprocess
+
+import sys
 
 
 # Constants
@@ -52,6 +54,17 @@ SALT_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("salt")
 
 
 # Functions
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+def setup_libraries():
+    try:
+        import keyboard
+    except ImportError:
+        print("keyboard library not found. Installing...")
+        install("keyboard")
+        import keyboard  # Retry importing after installation
 
 def set_time():
     time = int(input("Please enter the hour of the day (use 24 hour notation): "))
@@ -150,8 +163,9 @@ def access_control(user_select, user_role):
     print("Access Denied!")
 
 def main():
+    
     teller_access = set_time()
-    startup()
+    setup_libraries()
     print_operations()
     user_role = user_sign_in(teller_access)
 
