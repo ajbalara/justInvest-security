@@ -4,8 +4,6 @@
 # Imports
 import os
 
-from hashlib import blake2b
-
 import subprocess
 
 import sys
@@ -19,11 +17,19 @@ print("Setting up and installing libaries...")
 print()
 try:
     import keyboard
-    print("All dependencies already installed!")
+    print("Keyboard library already installed!")
 except ImportError:
     print("keyboard library not found. Installing...")
     install("keyboard")
     import keyboard  # Retry importing after installation
+
+try:
+    from argon2 import PasswordHasher
+    print("argon2 library already installed!")
+except ImportError:
+    print("argon2 library not found. Installing...")
+    install("argon2-cffi")
+    from argon2 import PasswordHasher  # Retry importing after installation
 print()
 
 
@@ -49,6 +55,8 @@ ACCESS_CONTROL_POLICY = {
     "Financial Planner": [1, 2, 3, 6, 7],
     "Teller": [1, 2]
 }
+
+USER_ROLES = ["Client", "Premium Client", "Financial Advisor", "Financial Planner", "Teller"]
 
 BUSINESS_DAY_START_HOUR = 9
 
@@ -170,12 +178,16 @@ def input_role()->str:
     print_roles()
     while True:
         try:
-            user_select = int(input("Which role would you like to signup as?\n"))
+            user_input = input("Which role would you like to signup as?\n")
+            user_select = int(user_input)
             if user_select < 1 or user_select > 5:
+                print("Bad Range")
                 print(INVALID_INPUT)
             else:
-                return ACCESS_CONTROL_POLICY[user_select]
+
+                return USER_ROLES[user_select]
         except:
+            print("Bad type: " + user_input)
             print(INVALID_INPUT)
 
 
@@ -209,6 +221,7 @@ def authenticate_user(username: str)->bool:
 
 def add_user(username, password, role):
     """ Adds user to the passwd file"""
+    #write_user_to_file(username, hash, salt, )
     return
 
 def write_user_to_file(username: str, hash: str, salt: str, role: str):
