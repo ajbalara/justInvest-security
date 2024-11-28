@@ -68,13 +68,11 @@ SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 PASSWORD_FILE_PATH = os.path.join(SCRIPT_PATH, FILENAME)
 
-PASSWORD_FILE_STRUCTURE = ["username", "hash", "salt", "role"]
+PASSWORD_FILE_STRUCTURE = ["username", "hash", "role"]
 
 USERNAME_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("username")
 
 HASH_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("hash")
-
-SALT_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("salt")
 
 ROLE_POSITION_IN_FILE = PASSWORD_FILE_STRUCTURE.index("role")
 
@@ -83,8 +81,15 @@ INVALID_INPUT = "Invalid input!\n"
 SPECIAL_INPUT = 0
 
 
+# Classes
+class User:
+    def __init__(self, username: str, role: str):
+        self.username = username
+        self.role = role
+
 # Functions
 
+# Setup Functions
 def set_time()->bool:
     """ Has the user set the time to a value between 0-24. Returns whether or not teller has access"""
     while True:
@@ -107,6 +112,7 @@ def startup():
     print("justInvestSystem")
     print("----------------------------------")
 
+
 def print_operations():
     print("Operations available on the system:")
     print("1. View account balance")
@@ -119,31 +125,30 @@ def print_operations():
     print("0. Quit")
     print()
 
-def user_sign_in(teller_access: bool)->str:
-    """ Signs the user in or registers them. Will not let tellers access the system if the time set is not between 9am and 7pm"""
+# Login Functions
+def user_sign_in(teller_access: bool)->User:
+    """ Signs the user in. Returns the user. Will not let tellers access the system if the time set is not between 9am and 7pm"""
     signed_in = False
-    
     while(not signed_in):
-        print()
         username = input("Enter username to sign in or enter 0 to register: ")
-        print()
-        signup = False
-        try:
-            signup = int(username) == SPECIAL_INPUT
-        except:
-            signup = False
-        if signup:
-            return launch_signup()
-        elif valid_username(username):
-            if (USERS[username] == "Teller" and not teller_access):
-                print("Teller can't access the system outside of business hours!")
+        if signup(username):
+            launch_signup()
+        else:
+            user_role = authenticate_user(username)
+            if user_role is None:
                 continue
-            correct_pwd = False
-            while(not correct_pwd):
-                correct_pwd = authenticate_user(username)
-            return USERS[username]
-        print("Invalid username, please try again")
+            return user_role
     
+def signup(username: str)->bool:
+    """ Returns if the user wants to signup or if they attempted to login"""
+    try_to_sign_up = False
+    try:
+        try_to_sign_up = int(username) == SPECIAL_INPUT
+    except:
+        try_to_sign_up = False
+    return try_to_sign_up
+
+
 def launch_signup()->str:
     """ Signs up user"""
     username = input("Please enter your desired username: ")
@@ -214,27 +219,39 @@ def valid_username(username: str)->bool:
 def authenticate_user(username: str)->bool:
     """ Returns whether user gives the correct password"""
 
-    pwd = input("Please enter your password: ")
+    password = input("Please enter your password: ")
+
+    ph = PasswordHasher()
+
+    hash = ph.hash(password)
+
+    user_data = check_file_for_user(username)
+
+    if user_data is None:
+        print("Usernam ")
+
     print("ACCESS GRANTED!")
     print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[USERS[username]])
     return True
 
 def add_user(username, password, role):
     """ Adds user to the passwd file"""
-    #write_user_to_file(username, hash, salt, )
+    ph = PasswordHasher()
+    hash = ph.hash(password)
+    write_user_to_file(username, hash, role)
     return
 
-def write_user_to_file(username: str, hash: str, salt: str, role: str):
+def write_user_to_file(username: str, hash: str, role: str):
     """ Writes a user to file"""
     file = open(PASSWORD_FILE_PATH, "a")   
 
-    string_to_write = "\n" + username + ", " + hash + ", " + salt + ", " + role
+    string_to_write = username + ", " + hash + ", " + role + "\n"
     file.write(string_to_write)
 
     file.close()
 
-def check_file_for_user(entered_username: str)-> tuple[str, str, str]:
-    """ Checks if the user is in the file and if so, returns a tuple containing it's hash value and the salt. Otherwise returns None"""
+def check_file_for_user(entered_username: str)-> tuple[str, str]:
+    """ Checks if the user is in the file and if so, returns a tuple containing their hash value and the role. Otherwise returns None"""
 
     file = open(PASSWORD_FILE_PATH, "r")
 
@@ -244,7 +261,7 @@ def check_file_for_user(entered_username: str)-> tuple[str, str, str]:
         username = values[USERNAME_POSITION_IN_FILE]
         
         if username == entered_username:
-            return (values[HASH_POSITION_IN_FILE], values[SALT_POSITION_IN_FILE], values[ROLE_POSITION_IN_FILE])
+            return (values[HASH_POSITION_IN_FILE], values[ROLE_POSITION_IN_FILE])
     return None
 
 
