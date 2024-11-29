@@ -8,8 +8,6 @@ import subprocess
 
 import sys
 
-import random
-
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
@@ -88,14 +86,13 @@ class User:
         self.role = role
 
 # Functions
-
 # Setup Functions
 def set_time()->bool:
-    """ Has the user set the time to a value between 0-24. Returns whether or not teller has access"""
+    """ Has the user set the time to a value between 0-23. Returns whether or not teller has access"""
     while True:
         try:
-            time = int(input("Please enter the hour of the day (use 24 hour notation): "))
-            if time < 0 or time > 24:
+            time = int(input("Please enter the hour of the day (use 24 hour notation). Note that 0 is 12am and 23 is 11pm: "))
+            if time < 0 or time > 23:
                 print(INVALID_INPUT)
                 continue
             return accessible_to_teller(time)
@@ -152,6 +149,9 @@ def check_user_input_is_zero(username: str)->bool:
 def launch_signup():
     """ Signs up user"""
     username = input("Please enter your desired username: ")
+    if check_file_for_user(username) is not None:
+        print("This username already exists!")
+        return
     password = input_password(True)
     role = input_role()
     add_user(username, password, role)
@@ -192,13 +192,10 @@ def input_role()->str:
             user_input = input("Which role would you like to signup as?\n")
             user_select = int(user_input)
             if user_select < 1 or user_select > 5:
-                print("Bad Range")
                 print(INVALID_INPUT)
             else:
-
-                return USER_ROLES[user_select]
+                return USER_ROLES[user_select-1]
         except:
-            print("Bad type: " + user_input)
             print(INVALID_INPUT)
 
 
@@ -227,16 +224,13 @@ def authenticate_user(username: str)->User:
 
     ph = PasswordHasher()
 
-    hash = ph.hash(password)
-
     try:
-        ph.verify(hash, file_hash)
+        ph.verify(file_hash, password)
     except:
         print("Wrong Password!")
         return None
     
     print("ACCESS GRANTED!")
-    print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[role])
     return User(username, role)
 
 def add_user(username, password, role):
@@ -262,7 +256,7 @@ def check_file_for_user(entered_username: str)-> tuple[str, str]:
 
     for line in file:
         entry = line.strip()
-        values = entry.split(',')
+        values = entry.split(', ')
         username = values[USERNAME_POSITION_IN_FILE]
         
         if username == entered_username:
@@ -294,8 +288,8 @@ def access_control(user_select: str, user_role: str):
         return
     print("Access Denied!")
 
-def display_access():
-    return
+def display_access(user: User):
+    print("Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + ACCESS_CONTROL_POLICY[user.role])
 
 def main():
     """ Main program that runs"""
@@ -303,8 +297,8 @@ def main():
     print_operations()
     user = user_sign_in(teller_access)
     display_access(user)
-
     while(True):
+        print_operations()
         user_select = user_selection()
         if quit(user_select):
             break
