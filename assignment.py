@@ -33,19 +33,6 @@ print()
 
 # Constants
 
-USERS = {
-    "Sasha Kim": "Client",
-    "Emery Blake": "Client",
-    "Noor Abbasi": "Premium Client",
-    "Zuri Adebayo": "Premium Client",
-    "Mikael Chen": "Financial Advisor",
-    "Jordan Riley": "Financial Advisor",
-    "Ellis Nakamura": "Financial Planner",
-    "Harper Diaz": "Financial Planner",
-    "Alex Hayes": "Teller",
-    "Adair Patel": "Teller"
-}
-
 ACCESS_CONTROL_POLICY = {
     "Client": [1, 2, 4],
     "Premium Client": [1, 2, 3, 4, 5],
@@ -101,7 +88,7 @@ def set_time()->bool:
             continue
 
 def accessible_to_teller(time: int)->bool:
-    """ Returns whether or not teller has access based on the given time"""
+    """ Returns true if teller has access based on the given time"""
     return time >= BUSINESS_DAY_START_HOUR and time <=BUSINESS_DAY_CLOSE_HOUR
 
 def startup():
@@ -132,10 +119,18 @@ def user_sign_in(teller_access: bool)->User:
             launch_signup()
         else:
             user = authenticate_user(username)
-            if user is None:
+            if user is None or not check_teller_logic(user, teller_access):
                 continue
             return user
-    
+
+def check_teller_logic(user: User, teller_access: bool)->bool:
+    """ Returns true if the user should be allowed to access the system based on the time of day and whether or not they are a teller"""
+    if user.role == "Teller" and not teller_access:
+        print("A Teller cannot access the system outside of business hours!")
+        return False
+    return True
+
+
 def check_user_input_is_zero(username: str)->bool:
     """ Returns if the user wants to signup or if they attempted to login"""
     try_to_sign_up = False
@@ -289,7 +284,7 @@ def access_control(user_select: str, user_role: str):
     print("Access Denied!")
 
 def display_access(user: User):
-    print("Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + ACCESS_CONTROL_POLICY[user.role])
+    print("Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
 
 def main():
     """ Main program that runs"""

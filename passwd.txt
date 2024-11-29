@@ -1,0 +1,10 @@
+Sasha Kim, $argon2id$v=19$m=65536,t=3,p=4$LJduSmGne2ih2S5t9P7BHw$v2bt2ihs3ifzLKong1j7tCCiyW99vZweienyZQ1wR/4, Client
+Emery Blake, $argon2id$v=19$m=65536,t=3,p=4$2L9HnITorfVJS7xYwpnupw$UlzAz9aGw00/um2PUcj/pV1QWQIuzZe8LLdDjgaqO8s, Client
+Noor Abbasi, $argon2id$v=19$m=65536,t=3,p=4$ghh+868+6ncQlPLnPZrVAQ$YmuXmoob9EweX74Dw250whhH3bHKwJxfJuhbCV8Pe+g, Premium Client
+Zuri Adebayo, $argon2id$v=19$m=65536,t=3,p=4$NWuCPscH9sDxdEMwbzlUwQ$znVETa19TK/080e/P1Auu2+eTrpGalmDvSbfwk9oiWM, Premium Client
+Mikael Chen, $argon2id$v=19$m=65536,t=3,p=4$ngWb6Gx6c9hvp/daN3leow$/ncWF3zpOi25lAMsmKZaVZtNbGU3musFMDbtPYgTqko, Financial Advisor
+Jordan Riley, $argon2id$v=19$m=65536,t=3,p=4$ljbyOScJuaYqMl9pJkEM7g$/Iu9QPBcBfgCGr+3kT+TIB3FScxtXSWPRu9+yvs8PiY, Financial Advisor
+Ellis Nakamura, $argon2id$v=19$m=65536,t=3,p=4$1by8uybzcsUkGfmm4KF+WA$nGPROFE/WnIHdsTiA5TTfaxKYXWQw+PqpaGTUa83leM, Financial Planner
+Harper Diaz, $argon2id$v=19$m=65536,t=3,p=4$KglN8jWxjXg/INyujC7gxw$I4k6+LN6y0mYvDD8x49HNwRzZ7jO6zRg/KGqYxLvo04, Financial Planner
+Alex Hayes, $argon2id$v=19$m=65536,t=3,p=4$UHxjsd6t2rfG3CNg1jOAUA$3BMlFOnmqOJ5sRW8a6c+Latu3N0fZHwa/pBseDh6vAg, Teller
+Adair Patel, $argon2id$v=19$m=65536,t=3,p=4$ZXmH8GtC3g2N+PSqp15uKw$pLLu3QEPl4mZLuYTtEiIuTwdFwvX1SNVTIBCPIZYSVI, Teller
