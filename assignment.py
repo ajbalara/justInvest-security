@@ -65,6 +65,28 @@ INVALID_INPUT = "Invalid input!\n"
 
 SPECIAL_INPUT = 0
 
+TOP_20_MOST_COMMON_PASSWORDS = [
+    "123456",
+    "123456789",
+    "12345",
+    "qwerty",
+    "password",
+    "12345678",
+    "111111",
+    "123123",
+    "1234567890",
+    "1234567",
+    "qwerty123",
+    "000000",
+    "1q2w3e",
+    "aa12345678",
+    "abc123",
+    "password1",
+    "1234",
+    "qwertyuiop",
+    "123321",
+    "password123"
+]
 
 # Classes
 class User:
@@ -147,14 +169,16 @@ def launch_signup():
     if check_file_for_user(username) is not None:
         print("This username already exists!")
         return
-    password = input_password(True)
+    password = input_password()
+    if not proactive_password_checker(password):
+        return
     role = input_role()
     add_user(username, password, role)
     print("Signup was successful!")
 
-def input_password(signup: bool)->str:
+def input_password()->str:
     """ Returns the password that the user enters"""
-    prompt="Enter password: "
+    prompt="Enter password (at least 8 characters, includes at least 1 number): "
     print(prompt, end='', flush=True)
     password = ""
     while True:
@@ -170,14 +194,20 @@ def input_password(signup: bool)->str:
             elif len(key.name) == 1:
                 password += key.name
                 print("*", end='', flush=True)
-
-    if signup:
-        proactive_password_checker() # TODO
     return password
 
-def proactive_password_checker():
-    # TODO
-    return
+def proactive_password_checker(password: str)->bool:
+    """ Returns True if the password meets the requirements"""
+    if len(password) < 8:
+        print("Password not long enough!")
+        return False
+    elif password in TOP_20_MOST_COMMON_PASSWORDS:
+        print("Weak password!")
+        return False
+    elif any(char.isdigit() for char in password):
+        print("Password does not contain a digit!")
+        return False
+    return True
 
 def input_role()->str:
     """ Returns the inputted role of the new user"""
@@ -215,7 +245,7 @@ def authenticate_user(username: str)->User:
 
     file_hash, role = user_data
 
-    password = input_password(False)
+    password = input_password()
 
     ph = PasswordHasher()
 
