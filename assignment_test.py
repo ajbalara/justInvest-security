@@ -1,8 +1,8 @@
-"""SYSC 2100 Winter 2023 Lab 8: some unit tests for Exercises 1, 2, 3 and 7."""
+# Anand Balaram SYSC 4810 Assignment Tests
 
 import unittest
 
-from assignment import access_control
+#from assignment import access_control
 
 
 class Access_Control_TestCase(unittest.TestCase):

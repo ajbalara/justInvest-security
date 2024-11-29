@@ -131,15 +131,15 @@ def user_sign_in(teller_access: bool)->User:
     signed_in = False
     while(not signed_in):
         username = input("Enter username to sign in or enter 0 to register: ")
-        if signup(username):
+        if check_user_input_is_zero(username):
             launch_signup()
         else:
-            user_role = authenticate_user(username)
-            if user_role is None:
+            user = authenticate_user(username)
+            if user is None:
                 continue
-            return user_role
+            return user
     
-def signup(username: str)->bool:
+def check_user_input_is_zero(username: str)->bool:
     """ Returns if the user wants to signup or if they attempted to login"""
     try_to_sign_up = False
     try:
@@ -149,16 +149,15 @@ def signup(username: str)->bool:
     return try_to_sign_up
 
 
-def launch_signup()->str:
+def launch_signup():
     """ Signs up user"""
     username = input("Please enter your desired username: ")
-    password = input_password()
+    password = input_password(True)
     role = input_role()
     add_user(username, password, role)
     print("Signup was successful!")
-    return username
 
-def input_password()->str:
+def input_password(signup: bool)->str:
     """ Returns the password that the user enters"""
     prompt="Enter password: "
     print(prompt, end='', flush=True)
@@ -176,7 +175,14 @@ def input_password()->str:
             elif len(key.name) == 1:
                 password += key.name
                 print("*", end='', flush=True)
+
+    if signup:
+        proactive_password_checker() # TODO
     return password
+
+def proactive_password_checker():
+    # TODO
+    return
 
 def input_role()->str:
     """ Returns the inputted role of the new user"""
@@ -206,33 +212,32 @@ def print_roles():
     print("5. Teller")
     print()
 
-def valid_username(username: str)->bool:
-    """ Returns whether username is in password file"""
-    reserved_keyword = False
-    try:
-        reserved_keyword = int(username) == SPECIAL_INPUT
-    except:
-        reserved_keyword = False
-
-    return not reserved_keyword and username in USERS
-
-def authenticate_user(username: str)->bool:
+def authenticate_user(username: str)->User:
     """ Returns whether user gives the correct password"""
 
-    password = input("Please enter your password: ")
+    user_data = check_file_for_user(username)
+
+    if user_data is None:
+        print("Username does not exist!")
+        return None
+
+    file_hash, role = user_data
+
+    password = input_password(False)
 
     ph = PasswordHasher()
 
     hash = ph.hash(password)
 
-    user_data = check_file_for_user(username)
-
-    if user_data is None:
-        print("Usernam ")
-
+    try:
+        ph.verify(hash, file_hash)
+    except:
+        print("Wrong Password!")
+        return None
+    
     print("ACCESS GRANTED!")
-    print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[USERS[username]])
-    return True
+    print("Your authorized operations are: ", ACCESS_CONTROL_POLICY[role])
+    return User(username, role)
 
 def add_user(username, password, role):
     """ Adds user to the passwd file"""
@@ -289,17 +294,21 @@ def access_control(user_select: str, user_role: str):
         return
     print("Access Denied!")
 
+def display_access():
+    return
+
 def main():
     """ Main program that runs"""
     teller_access = set_time()
     print_operations()
-    user_role = user_sign_in(teller_access)
+    user = user_sign_in(teller_access)
+    display_access(user)
 
     while(True):
         user_select = user_selection()
         if quit(user_select):
             break
-        access_control(user_select, user_role)
+        access_control(user_select, user)
 
 # Main program
 
