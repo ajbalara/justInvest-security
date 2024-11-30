@@ -9,13 +9,13 @@ from assignment import access_control, ACCESS_CONTROL_POLICY
 class Access_Control_TestCase(unittest.TestCase):
     """Test access_control (Problem 1c)"""
 
-    def test_1(self):
+    def test_access_granted(self):
         """ Expect all True"""
         for role in ACCESS_CONTROL_POLICY:
             for access in ACCESS_CONTROL_POLICY[role]:
                 self.assertTrue(access_control(access, role))
 
-    def test_2(self):
+    def test_access_denied(self):
         """ Expect all False"""
         deny_list = dict()
 
