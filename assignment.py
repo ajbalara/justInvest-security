@@ -307,12 +307,11 @@ def quit(user_select: int)->bool:
     return user_select == SPECIAL_INPUT
 
 # Access Control Functions
-def access_control(user_select: str, user_role: str):
-    """ Prints if user has access to a service"""
+def access_control(user_select: str, user_role: str)->bool:
+    """ Prints if user has access to a service. Returns whether or not they have access"""
     if (user_select in ACCESS_CONTROL_POLICY[user_role]):
-        print("Access Granted!")
-        return
-    print("Access Denied!")
+        return True
+    return False
 
 def display_access(user: User):
     print("Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
@@ -328,7 +327,10 @@ def main():
         user_select = user_selection()
         if quit(user_select):
             break
-        access_control(user_select, user)
+        if access_control(user_select, user):
+            print("Access Granted!")
+        else:
+            print("Access Denied!")
 
 # Main program
 
