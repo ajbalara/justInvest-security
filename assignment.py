@@ -285,7 +285,9 @@ def get_user_from_file(password_file_path: str, entered_username: str)-> tuple[s
         username = values[USERNAME_POSITION_IN_FILE]
         
         if username == entered_username:
+            file.close()
             return (values[HASH_POSITION_IN_FILE], values[ROLE_POSITION_IN_FILE])
+    file.close()
     return None
 
 
