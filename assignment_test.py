@@ -2,9 +2,8 @@
 
 # Imports
 import unittest
-from assignment import access_control, ACCESS_CONTROL_POLICY, write_user_to_file, get_user_from_file, install, launch_signup, proactive_password_checker
+from assignment import access_control, ACCESS_CONTROL_POLICY, write_user_to_file, get_user_from_file, install, proactive_password_checker, display_access, User
 import os
-
 try:
     from argon2 import PasswordHasher
     print("argon2 library already installed!")
@@ -88,5 +87,49 @@ class Proactive_Password_Checker_TestCase(unittest.TestCase):
         self.assertFalse(proactive_password_checker("password1"))
         self.assertFalse(proactive_password_checker("nodigitshere"))
 
+class Display_Access_TestCase(unittest.TestCase):
+    """ Test display_access (Problem 4c)"""
+
+    def test_client(self):
+        username = TEST_USERNAME
+        role = "Client"
+
+        user = User(username, role)
+
+        self.assertEquals(display_access(user), "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+
+    def test_premium_client(self):
+        username = TEST_USERNAME
+        role = "Premium Client"
+
+        user = User(username, role)
+
+        self.assertEquals(display_access(user), "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+        
+    def test_financial_advisor(self):
+        username = TEST_USERNAME
+        role = "Financial Advisor"
+
+        user = User(username, role)
+
+        self.assertEquals(display_access(user), "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+        
+    def test_financial_planner(self):
+        username = TEST_USERNAME
+        role = "Financial Planner"
+
+        user = User(username, role)
+
+        self.assertEquals(display_access(user), "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+        
+    def test_teller(self):
+        username = TEST_USERNAME
+        role = "Teller"
+
+        user = User(username, role)
+
+        self.assertEquals(display_access(user), "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+    
+    
 if __name__ == '__main__':
     unittest.main(verbosity=2)

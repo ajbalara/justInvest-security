@@ -316,8 +316,11 @@ def access_control(user_select: str, user_role: str)->bool:
         return True
     return False
 
-def display_access(user: User):
-    print("Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role]))
+def display_access(user: User)->str:
+    """ Prints the operations the user has access to. Returns the string for testing purposes"""
+    string_to_print = "Welcome " + user.username + "! You are a " + user.role + ". You can access operations: " + str(ACCESS_CONTROL_POLICY[user.role])
+    print(string_to_print)
+    return string_to_print
 
 def main():
     """ Main program that runs"""
