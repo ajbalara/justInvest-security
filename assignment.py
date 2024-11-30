@@ -166,7 +166,7 @@ def check_user_input_is_zero(username: str)->bool:
 def launch_signup():
     """ Signs up user"""
     username = input("Please enter your desired username: ")
-    if check_file_for_user(username) is not None:
+    if get_user_from_file(PASSWORD_FILE_PATH, username) is not None:
         print("This username already exists!")
         return
     password = input_password()
@@ -237,7 +237,7 @@ def print_roles():
 def authenticate_user(username: str)->User:
     """ Returns whether user gives the correct password"""
 
-    user_data = check_file_for_user(username)
+    user_data = get_user_from_file(PASSWORD_FILE_PATH, username)
 
     if user_data is None:
         print("Username does not exist!")
@@ -262,22 +262,22 @@ def add_user(username, password, role):
     """ Adds user to the passwd file"""
     ph = PasswordHasher()
     hash = ph.hash(password)
-    write_user_to_file(username, hash, role)
+    write_user_to_file(PASSWORD_FILE_PATH, username, hash, role)
     return
 
-def write_user_to_file(username: str, hash: str, role: str):
+def write_user_to_file(password_file_path: str, username: str, hash: str, role: str):
     """ Writes a user to file"""
-    file = open(PASSWORD_FILE_PATH, "a")   
+    file = open(password_file_path, "a")   
 
     string_to_write = username + ", " + hash + ", " + role + "\n"
     file.write(string_to_write)
 
     file.close()
 
-def check_file_for_user(entered_username: str)-> tuple[str, str]:
+def get_user_from_file(password_file_path: str, entered_username: str)-> tuple[str, str]:
     """ Checks if the user is in the file and if so, returns a tuple containing their hash value and the role. Otherwise returns None"""
 
-    file = open(PASSWORD_FILE_PATH, "r")
+    file = open(password_file_path, "r")
 
     for line in file:
         entry = line.strip()
