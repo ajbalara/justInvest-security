@@ -163,18 +163,19 @@ def check_user_input_is_zero(username: str)->bool:
     return try_to_sign_up
 
 
-def launch_signup():
-    """ Signs up user"""
+def launch_signup()->bool:
+    """ Signs up user. Returns if successful for testing purposes"""
     username = input("Please enter your desired username: ")
     if get_user_from_file(PASSWORD_FILE_PATH, username) is not None:
         print("This username already exists!")
-        return
+        return False
     password = input_password()
     if not proactive_password_checker(password):
-        return
+        return False
     role = input_role()
     add_user(username, password, role)
     print("Signup was successful!")
+    return True
 
 def input_password()->str:
     """ Returns the password that the user enters"""

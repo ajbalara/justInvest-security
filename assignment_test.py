@@ -2,7 +2,7 @@
 
 # Imports
 import unittest
-from assignment import access_control, ACCESS_CONTROL_POLICY, write_user_to_file, get_user_from_file, install
+from assignment import access_control, ACCESS_CONTROL_POLICY, write_user_to_file, get_user_from_file, install, launch_signup, proactive_password_checker
 import os
 
 try:
@@ -20,6 +20,12 @@ FILENAME = "test_passwd.txt"
 SCRIPT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 PASSWORD_FILE_PATH = os.path.join(SCRIPT_PATH, FILENAME)
+
+TEST_USERNAME = "Test"
+
+TEST_PASSWORD = "verysecurepassword123"
+
+TEST_ROLE = "Client"
 
 # Tests
 class Access_Control_TestCase(unittest.TestCase):
@@ -49,13 +55,13 @@ class Write_and_Get_File_TestCase(unittest.TestCase):
     """ Test write_user_to_file and get_user_from_file (Problem 2d)"""
 
     def test_writing_and_getting(self):
-        username = "Test"
-        password = "verysecurepassword123"
+        username = TEST_USERNAME
+        password = TEST_PASSWORD
         
         ph = PasswordHasher()
         hash = ph.hash(password)
 
-        role = "Client"
+        role = TEST_ROLE
 
         write_user_to_file(PASSWORD_FILE_PATH, username, hash, role)
 
@@ -71,7 +77,16 @@ class Write_and_Get_File_TestCase(unittest.TestCase):
         with open(PASSWORD_FILE_PATH, "w") as file:
             pass
 
+class Proactive_Password_Checker_TestCase(unittest.TestCase):
+    """ Test proactive_password_checker (Problem 3c)"""
 
+    def test_valid_password(self):
+        self.assertTrue(proactive_password_checker("thisIsAValidPassword123"))
+    
+    def test_invalid_passwords(self):
+        self.assertFalse(proactive_password_checker("short1"))
+        self.assertFalse(proactive_password_checker("password1"))
+        self.assertFalse(proactive_password_checker("nodigitshere"))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
