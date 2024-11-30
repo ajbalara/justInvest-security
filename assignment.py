@@ -306,6 +306,7 @@ def quit(user_select: int)->bool:
     """ Returns whether the user has chosen to quit the program"""
     return user_select == SPECIAL_INPUT
 
+# Access Control Functions
 def access_control(user_select: str, user_role: str):
     """ Prints if user has access to a service"""
     if (user_select in ACCESS_CONTROL_POLICY[user_role]):
