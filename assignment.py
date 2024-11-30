@@ -204,7 +204,7 @@ def proactive_password_checker(password: str)->bool:
     elif password in TOP_20_MOST_COMMON_PASSWORDS:
         print("Weak password!")
         return False
-    elif any(char.isdigit() for char in password):
+    elif not any(char.isdigit() for char in password):
         print("Password does not contain a digit!")
         return False
     return True
@@ -329,7 +329,7 @@ def main():
         user_select = user_selection()
         if quit(user_select):
             break
-        if access_control(user_select, user):
+        if access_control(user_select, user.role):
             print("Access Granted!")
         else:
             print("Access Denied!")
