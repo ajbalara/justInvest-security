@@ -1,5 +1,22 @@
 # Anand Balaram SYSC 4810 Assignment
 
+# System Functions
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+def getch():
+    """Get a single character from the user."""
+    if os.name == 'nt':  # Windows
+        return msvcrt.getch().decode('utf-8')
+    else:  # Linux/Unix
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
 
 # Imports
 import os
@@ -91,24 +108,6 @@ class User:
         self.role = role
 
 # Functions
-
-# System Functions
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-def getch():
-    """Get a single character from the user."""
-    if os.name == 'nt':  # Windows
-        return msvcrt.getch().decode('utf-8')
-    else:  # Linux/Unix
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
 
 # Setup Functions
 def set_time()->bool:
