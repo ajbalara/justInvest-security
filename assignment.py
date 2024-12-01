@@ -8,18 +8,14 @@ import subprocess
 
 import sys
 
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
 print("Setting up and installing libaries...")
 print()
-try:
-    import keyboard
-    print("Keyboard library already installed!")
-except ImportError:
-    print("keyboard library not found. Installing...")
-    install("keyboard")
-    import keyboard  # Retry importing after installation
+
+if os.name == 'nt':  # Windows
+    import msvcrt
+else:  # Linux/Unix
+    import tty
+    import termios
 
 try:
     from argon2 import PasswordHasher
@@ -95,6 +91,25 @@ class User:
         self.role = role
 
 # Functions
+
+# System Functions
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+def getch():
+    """Get a single character from the user."""
+    if os.name == 'nt':  # Windows
+        return msvcrt.getch().decode('utf-8')
+    else:  # Linux/Unix
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(fd)
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
 # Setup Functions
 def set_time()->bool:
     """ Has the user set the time to a value between 0-23. Returns whether or not teller has access"""
@@ -169,7 +184,7 @@ def launch_signup()->bool:
     if get_user_from_file(PASSWORD_FILE_PATH, username) is not None:
         print("This username already exists!")
         return False
-    password = input_password()
+    password = input_password("Choose a password (minimum 8 characters, at least 1 number): ")
     if not proactive_password_checker(password):
         return False
     role = input_role()
@@ -177,25 +192,27 @@ def launch_signup()->bool:
     print("Signup was successful!")
     return True
 
-def input_password()->str:
-    """ Returns the password that the user enters"""
-    prompt="Enter password (at least 8 characters, includes at least 1 number): "
-    print(prompt, end='', flush=True)
-    password = ""
+
+def input_password(prompt):
+    """Prompt for password input, showing '*' instead of characters."""
+    print(prompt, end="", flush=True)
+    password = []
+
     while True:
-        key = keyboard.read_event(suppress=True)
-        if key.event_type == "down":
-            if key.name == "enter":
-                print()
-                break
-            elif key.name == "backspace":
-                if password:
-                    password = password[:-1]
-                    print("\b \b", end='', flush=True)
-            elif len(key.name) == 1:
-                password += key.name
-                print("*", end='', flush=True)
-    return password
+        ch = getch()
+        if ch == '\r' or ch == '\n':  # Enter key (End input)
+            break
+        elif ch == '\x08' or ch == '\x7f':  # Backspace key
+            if password:
+                password.pop()
+                # Handle removing the last '*' on the screen
+                print("\b \b", end="", flush=True)
+        else:  # Normal character
+            password.append(ch)
+            print("*", end="", flush=True)
+
+    print()  # Print a newline after input
+    return ''.join(password)
 
 def proactive_password_checker(password: str)->bool:
     """ Returns True if the password meets the requirements"""
@@ -246,7 +263,7 @@ def authenticate_user(username: str)->User:
 
     file_hash, role = user_data
 
-    password = input_password()
+    password = input_password("Enter your password: ")
 
     ph = PasswordHasher()
 
