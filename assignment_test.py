@@ -80,12 +80,14 @@ class Proactive_Password_Checker_TestCase(unittest.TestCase):
     """ Test proactive_password_checker (Problem 3c)"""
 
     def test_valid_password(self):
-        self.assertTrue(proactive_password_checker("thisIsAValidPassword123"))
+        self.assertTrue(proactive_password_checker(TEST_USERNAME, "Valid123"))
     
     def test_invalid_passwords(self):
-        self.assertFalse(proactive_password_checker("short1"))
-        self.assertFalse(proactive_password_checker("password1"))
-        self.assertFalse(proactive_password_checker("nodigitshere"))
+        username = TEST_USERNAME
+        test_passwords = ["Short1", "WayTooLong123456789", "password1", "Nodigits", "NOLOWER123", "noupper123", username]
+
+        for password in test_passwords:
+            self.assertFalse(proactive_password_checker(username, password))
 
 class Display_Access_TestCase(unittest.TestCase):
     """ Test display_access (Problem 4c)"""

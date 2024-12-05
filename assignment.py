@@ -184,7 +184,7 @@ def launch_signup()->bool:
         print("This username already exists!")
         return False
     password = input_password("Choose a password (minimum 8 characters, at least 1 number): ")
-    if not proactive_password_checker(password):
+    if not proactive_password_checker(username, password):
         return False
     role = input_role()
     add_user(username, password, role)
@@ -213,16 +213,28 @@ def input_password(prompt):
     print()  # Print a newline after input
     return ''.join(password)
 
-def proactive_password_checker(password: str)->bool:
+def proactive_password_checker(username: str, password: str)->bool:
     """ Returns True if the password meets the requirements"""
     if len(password) < 8:
         print("Password not long enough!")
+        return False
+    elif len(password) > 12:
+        print("Password too long!")
         return False
     elif password in TOP_20_MOST_COMMON_PASSWORDS:
         print("Weak password!")
         return False
     elif not any(char.isdigit() for char in password):
         print("Password does not contain a digit!")
+        return False
+    elif not any(char.islower() for char in password):
+        print("Password does not contain a lower-case letter!")
+        return False
+    elif not any(char.isupper() for char in password):
+        print("Password does not contain a lower-case letter!")
+        return False
+    elif password == username:
+        print("Password cannot be the same as username!")
         return False
     return True
 
