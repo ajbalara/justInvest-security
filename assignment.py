@@ -231,7 +231,7 @@ def proactive_password_checker(username: str, password: str)->bool:
         print("Password does not contain a lower-case letter!")
         return False
     elif not any(char.isupper() for char in password):
-        print("Password does not contain a lower-case letter!")
+        print("Password does not contain a upper-case letter!")
         return False
     elif password == username:
         print("Password cannot be the same as username!")
